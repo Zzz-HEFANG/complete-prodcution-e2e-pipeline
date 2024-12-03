@@ -32,6 +32,9 @@ pipeline{
         }
 
         stage('SonarQube Analysis'){
+            environment{
+                SONAR_TOKEN = credentials('sonar-token')
+            }
             steps{
                 withSonarQubeEnv(installationName: 'SonarQube') {
                     sh """
@@ -39,9 +42,7 @@ pipeline{
                         -Dsonar.projectKey=my-project \
                         -Dsonar.projectName=my-project \
                         -Dsonar.host.url=http://sonarqube:9000 \
-                        -Dsonar.login=${SONAR_TOKEN}
                     """
-                    //asd
                 }
             }
         }
