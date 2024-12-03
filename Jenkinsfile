@@ -30,6 +30,19 @@ pipeline{
                 sh "mvn test"
             }
         }
+
+        stage('SonarQube Analysis'){
+            steps{
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        sonar-scanner \
+                            -Dsonar.projectKey=my-project \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://sonarqube:9000
+                    '''
+                }
+            }
+        }
     }
 
 }
