@@ -5,7 +5,6 @@ pipeline{
     tools{
         jdk 'java17'
         maven 'Maven3'
-        sonarqube 'SonarQube Scanner'
     }
     stages{
         stage('Cleanup Workspace'){
@@ -34,13 +33,9 @@ pipeline{
 
         stage('SonarQube Analysis'){
             steps{
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        sonar-scanner \
-                            -Dsonar.projectKey=my-project \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=http://sonarqube:9000
-                    '''
+                withSonarQubeEnv(installationName: 'SonarQube') {
+                    sh 'mvn clean verify sonar:sonar'
+                    //asd
                 }
             }
         }
