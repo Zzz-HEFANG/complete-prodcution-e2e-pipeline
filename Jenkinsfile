@@ -34,7 +34,13 @@ pipeline{
         stage('SonarQube Analysis'){
             steps{
                 withSonarQubeEnv(installationName: 'SonarQube') {
-                    sh 'mvn clean verify sonar:sonar'
+                    sh """
+                        mvn clean verify sonar:sonar \
+                        -Dsonar.projectKey=my-project \
+                        -Dsonar.projectName=my-project \
+                        -Dsonar.host.url=http://sonarqube:9000 \
+                        -Dsonar.login=${SONAR_TOKEN}
+                    """
                     //asd
                 }
             }
