@@ -12,7 +12,7 @@ pipeline {
         APP_NAME = "e2e"
         RELEASE = "1.0.0"
         DOCKER_CREDS = credentials('docker-credentials')
-        DOCKER_USERNAME="oliver"
+        DOCKER_USERNAME="oliver0313"
         IMAGE_NAME = "${DOCKER_USERNAME}/${APP_NAME}"
     
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
