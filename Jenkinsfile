@@ -41,7 +41,8 @@ pipeline{
                         mvn clean verify sonar:sonar \
                         -Dsonar.projectKey=my-project \
                         -Dsonar.projectName=my-project \
-                        -Dsonar.host.url= https://eeaa-163-53-145-7.ngrok-free.app \
+                        -Dsonar.host.url=\${SONAR_HOST_URL} \
+                        -Dsonar.login=\${SONAR_TOKEN}
                     """
                 }
             }
