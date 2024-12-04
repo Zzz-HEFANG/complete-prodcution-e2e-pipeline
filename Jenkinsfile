@@ -9,9 +9,8 @@ pipeline{
     environment{
         APP_NAME  = "e2e"
         RELEASE = "1.0.0"
-        DOCKER_USER ="${DOCKER_CREDS_USR}"
-        DOCKER_PASS = "${DOCKER_CREDS_PSW}"
-        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
+        DOCKER_CREDS = credentials('docker-credentials')
+        IMAGE_NAME = "${DOCKER_CREDS_USR}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
     stages{
@@ -53,12 +52,9 @@ pipeline{
         stage("Build and Push Docker Image"){
             steps{
                 script{
-                    docekr.withRegistry('',DOCKER_PASS){
-                        docker_image = docker.build "${IMAGE_NAME}"
-                    }
-
-                    docker.withRegistry('',DOCKER_PASS){
-                        docker_image.push("${IMAGE_TAG}")
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-credentials'){
+                        def docker_image = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                        docker_image.push()
                         docker_image.push('latest')
                     }
                 }
