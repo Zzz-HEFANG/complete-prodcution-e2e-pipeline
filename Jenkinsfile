@@ -10,7 +10,7 @@ pipeline{
         APP_NAME  = "e2e"
         RELEASE = "1.0.0"
         DOCKER_CREDS = credentials('docker-credentials')
-        IMAGE_NAME = "${DOCKER_CREDS_USR}" + "/" + "${APP_NAME}"
+        IMAGE_NAME = "${DOCKER_CREDS_USR}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
     stages{
