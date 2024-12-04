@@ -6,6 +6,14 @@ pipeline{
         jdk 'java17'
         maven 'Maven3'
     }
+    environment{
+        APP_NAME  = "e2e"
+        RELEASE = "1.0.0"
+        DOCKER_USER ="${DOCKER_CREDS_USR}"
+        DOCKER_PASS = "${DOCKER_CREDS_PSW}"
+        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+    }
     stages{
         stage('Cleanup Workspace'){
             steps{
@@ -38,6 +46,21 @@ pipeline{
             steps{
                 withSonarQubeEnv('SonarQube') {
                     sh "mvn clean verify sonar:sonar"
+                }
+            }
+        }
+
+        stage("Build and Push Docker Image"){
+            steps{
+                script{
+                    docekr.withRegistry('',DOCKER_PASS){
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+
+                    docker.withRegistry('',DOCKER_PASS){
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
+                    }
                 }
             }
         }
