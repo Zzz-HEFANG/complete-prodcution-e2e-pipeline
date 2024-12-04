@@ -36,14 +36,8 @@ pipeline{
                 SONAR_TOKEN = credentials('sonar-token')
             }
             steps{
-                withSonarQubeEnv(installationName: 'SonarQube') {
-                    sh """
-                        mvn clean verify sonar:sonar \
-                        -Dsonar.projectKey=my-project \
-                        -Dsonar.projectName=my-project \
-                        -Dsonar.host.url=\${SONAR_HOST_URL} \
-                        -Dsonar.login=\${SONAR_TOKEN}
-                    """
+                withSonarQubeEnv('SonarQube') {
+                    sh "mvn clean verify sonar:sonar"
                 }
             }
         }
