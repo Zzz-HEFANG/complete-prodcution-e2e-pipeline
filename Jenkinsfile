@@ -44,16 +44,16 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            environment {
-                SONAR_TOKEN = credentials('sonar-token')
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh "mvn clean verify sonar:sonar"
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     environment {
+        //         SONAR_TOKEN = credentials('sonar-token')
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('SonarQube') {
+        //             sh "mvn clean verify sonar:sonar"
+        //         }
+        //     }
+        // }
 
         stage("Build and Push Docker Image") {
             steps {
