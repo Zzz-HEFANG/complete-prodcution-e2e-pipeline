@@ -76,33 +76,35 @@ pipeline {
         }
 
         stage("Update Deployment Configuration"){
-            script{
-                    sh """
-                        # Create and enter a temporary directory
-                        TEMP_DIR=\$(mktemp -d)
-                        cd \$TEMP_DIR
+            steps{
+                script{
+                        sh """
+                            # Create and enter a temporary directory
+                            TEMP_DIR=\$(mktemp -d)
+                            cd \$TEMP_DIR
+                            
+                            # Clone the configuration repository
+                            git clone ${GIT_CONFIG_REPO} .
+                            
+                            # Update the image tags
+                            sed -i 's|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' overlays/dev/deployment-patch.yaml
+                            
+                            # Configure Git
+                            git config user.email "zezhengzhao@gmail.com"
+                            git config user.name "Oliver"
+                            
+                            # Commit and push changes
+                            git add .
+                            git commit -m "Update image tag to ${IMAGE_TAG} [skip ci]"
+                            git push origin main
+                            
+                            # Clean up
+                            cd ..
+                            rm -rf \$TEMP_DIR
+                        """
                         
-                        # Clone the configuration repository
-                        git clone ${GIT_CONFIG_REPO} .
-                        
-                        # Update the image tags
-                        sed -i 's|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' overlays/dev/deployment-patch.yaml
-                        
-                        # Configure Git
-                        git config user.email "zezhengzhao@gmail.com"
-                        git config user.name "Oliver"
-                        
-                        # Commit and push changes
-                        git add .
-                        git commit -m "Update image tag to ${IMAGE_TAG} [skip ci]"
-                        git push origin main
-                        
-                        # Clean up
-                        cd ..
-                        rm -rf \$TEMP_DIR
-                    """
-                    
-                    echo "Configuration repository updated. Argo CD will detect changes and update the deployment."
+                        echo "Configuration repository updated. Argo CD will detect changes and update the deployment."
+                }
             }
         }
     }
