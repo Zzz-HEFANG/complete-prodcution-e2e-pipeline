@@ -81,7 +81,10 @@ pipeline {
                         # 克隆配置仓库到临时目录
                         TEMP_DIR=\$(mktemp -d)
                         cd \$TEMP_DIR
-                        git clone ${GIT_CONFIG_REPO} .
+                        
+                        git clone https://\$GIT_CREDS_USR:\$GIT_CREDS_PSW@github.com/Zzz-HEFANG/e2e-k8s-configs.git .
+
+
                         
                         # 更新镜像标签并检查是否有变化
                         sed -i 's|image: oliver0313/e2e:.*|image: oliver0313/e2e:${IMAGE_TAG}|' base/deployment.yaml
