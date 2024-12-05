@@ -75,38 +75,53 @@ pipeline {
             }
         }
 
-        stage("Update Deployment Configuration"){
-            steps{
-                script{
-                        sh """
-                            # Create and enter a temporary directory
-                            TEMP_DIR=\$(mktemp -d)
-                            cd \$TEMP_DIR
+        stage("Update Deployment Configuration") {
+            steps {
+                script {
+                    sh """
+                        # 创建临时目录并记录
+                        TEMP_DIR=\$(mktemp -d)
+                        echo "创建临时工作目录: \$TEMP_DIR"
+                        cd \$TEMP_DIR
+                        
+                        # 克隆配置仓库
+                        echo "正在克隆配置仓库..."
+                        git clone ${GIT_CONFIG_REPO} .
+                        
+                        # 获取当前配置中的镜像标签
+                        CURRENT_TAG=\$(grep -o 'image: oliver0313/e2e:.*' overlays/dev/deployment-patch.yaml | cut -d':' -f3)
+                        echo "当前配置中的镜像标签: \$CURRENT_TAG"
+                        echo "准备更新的新标签: ${IMAGE_TAG}"
+                        
+                        # 比较标签版本并决定是否需要更新
+                        if [ "\$CURRENT_TAG" != "${IMAGE_TAG}" ]; then
+                            echo "检测到新版本，开始更新配置..."
                             
-                            # Clone the configuration repository
-                            git clone ${GIT_CONFIG_REPO} .
+                            # 更新镜像标签
+                            sed -i 's|image: oliver0313/e2e:.*|image: oliver0313/e2e:${IMAGE_TAG}|' overlays/dev/deployment-patch.yaml
                             
-                            # Update the image tags
-                            sed -i 's|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' overlays/dev/deployment-patch.yaml
-                            
-                            # Configure Git
+                            # 配置 Git 身份
                             git config user.email "zezhengzhao@gmail.com"
                             git config user.name "Oliver"
                             
-                            # Commit and push changes
+                            # 提交更改
                             git add .
-                            git commit -m "Update image tag to ${IMAGE_TAG} [skip ci]"
+                            git commit -m "将镜像标签从 \$CURRENT_TAG 更新到 ${IMAGE_TAG} [skip ci]"
                             git push origin main
                             
-                            # Clean up
-                            cd ..
-                            rm -rf \$TEMP_DIR
-                        """
+                            echo "配置更新成功，新镜像标签: ${IMAGE_TAG}"
+                        else
+                            echo "当前配置已经是最新版本（${IMAGE_TAG}），无需更新"
+                        fi
                         
-                        echo "Configuration repository updated. Argo CD will detect changes and update the deployment."
+                        # 清理临时目录
+                        cd ..
+                        rm -rf \$TEMP_DIR
+                        echo "清理完成，临时目录已删除"
+                    """
                 }
             }
-        }
+}
     }
 
     post{
