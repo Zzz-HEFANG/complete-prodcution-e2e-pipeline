@@ -84,7 +84,7 @@ pipeline {
                         git clone ${GIT_CONFIG_REPO} .
                         
                         # 更新镜像标签并检查是否有变化
-                        sed -i 's|image: oliver0313/e2e:.*|image: oliver0313/e2e:${IMAGE_TAG}|' overlays/dev/deployment-patch.yaml
+                        sed -i 's|image: oliver0313/e2e:.*|image: oliver0313/e2e:${IMAGE_TAG}|' base/deployment.yaml
                         
                         # 如果有变化，提交并推送
                         if git status --porcelain | grep -q '^'; then
